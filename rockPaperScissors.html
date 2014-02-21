@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leap Sample 1</title>
+	<link rel='stylesheet' type='text/css' href='sample1/style.css' />
+</head>
+<body>
+	<h1>Leap Sample 1</h1>
+	<div id='display'>
+		Loading...
+	</div>
+
+	<table>
+	<tr><td> <div id='playerScore'>
+		0
+	</div></td>
+	<td><div id='computerScore'>
+		0
+	</div></td>
+	<tr><td>
+	<div id="poop"><img id="imageID"> </div>
+	</td><td>
+	v.s.
+	</td><td>
+	<div id="poop2"><img id="imageID2"> </div>
+	</td></tr></table>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script src='http://js.leapmotion.com/0.4.0/leap.js'></script>
+	<script type='text/javascript'>
+		var bounceCount = 0;
+
+		function getRandomImage(randomNumber) {
+		    if (randomNumber<1) {
+		    	return 'http://cdn.downloads.palm.com/public/com.ddluk.rockpaperscissors/1.1.0/en/images/2/L/ph_rockpaperscissors_v1_2.png';
+		    } else if (randomNumber<2){
+		    	return 'http://cdn.downloads.palm.com/public/com.ddluk.rockpaperscissors/1.1.0/en/images/3/L/ph_rockpaperscissors_v1_3.png';
+		    } else if (randomNumber<3) {
+		    	return 'http://cdn.downloads.palm.com/public/com.ddluk.rockpaperscissors/1.1.0/en/images/4/L/ph_rockpaperscissors_v1_4.png';
+		    }
+		    return 'http://cdn.downloads.palm.com/public/com.ddluk.rockpaperscissors/1.1.0/en/images/4/L/ph_rockpaperscissors_v1_4.png';
+		}
+
+
+
+		$(document).ready(function() {
+
+			var wasSeen = false;
+			
+			if (typeof(Leap) === 'undefined') {
+				$('#display').html('Leap JS client library, leap.js, not found');
+				alert('Leap JS client library, leap.js, not found.');
+			} else {
+				// Note: Leap produces frames faster than the browser can 
+				// utilize them, so while it is possible to get them all, 
+				// we will only receive frames on repaint here (Leap.loop 
+				// uses requestAnimationFrame).
+
+				var lmOptions = { enableGestures: true };
+
+				var playerScore = 0;
+				var computerScore = 0;
+				Leap.loop(lmOptions, function(frame) {
+					var displayMsg = 'No hands detected';
+					if (frame.hands.length > 0) {
+
+						displayMsg = 'Hand(s) detected<br />';
+
+						var hand = frame.hands[0];
+
+						if (window.bounceCount <3 && !wasSeen) {
+							window.bounceCount++;
+							wasSeen = true;
+						} else if (window.bounceCount >= 3) {
+							window.bounceCount = 0;
+							var moveNumber;
+							if (hand.pointables.length ==0) {
+								$('#imageID').attr('src','http://cdn.downloads.palm.com/public/com.ddluk.rockpaperscissors/1.1.0/en/images/2/L/ph_rockpaperscissors_v1_2.png');
+								moveNumber = 0;
+							} else if (hand.pointables.length<=2) {
+								$('#imageID').attr('src','http://cdn.downloads.palm.com/public/com.ddluk.rockpaperscissors/1.1.0/en/images/3/L/ph_rockpaperscissors_v1_3.png');
+								moveNumber = 1;
+							} else if (hand.pointables.length<=5) {
+								$('#imageID').attr('src','http://cdn.downloads.palm.com/public/com.ddluk.rockpaperscissors/1.1.0/en/images/4/L/ph_rockpaperscissors_v1_4.png');
+								moveNumber = 2;
+							}
+
+		    				var computerNumber = Math.round(Math.random() * 2);
+		    				console.log(moveNumber+' '+computerNumber);
+		    				if (computerNumber == moveNumber) {
+
+		    				} else if (moveNumber < computerNumber) {
+		    					if (computerNumber == 2 && moveNumber == 0) {
+
+		    						computerScore++;
+		    					} else {
+		    						playerScore++;
+		    					}
+		    				} else {
+		    					if (moveNumber == 2 && computerNumber == 0) {
+		    						playerScore++;
+		    					} else {
+		    						computerScore++;
+		    					}
+		    				}
+
+
+		    				$('#display').html(displayMsg);
+		    				$('#playerScore').html(playerScore);
+		    				$('#computerScore').html(computerScore);
+		    				var url = getRandomImage(computerNumber);
+							$('#imageID2').attr('src',url);
+						}
+
+						displayMsg += '<br />number of bounces:'+window.bounceCount;
+
+
+						// for (var i = 0; i < frame.hands.length; i++) {
+
+						// 	var hand = frame.hands[i];
+						// 	var heightMm = Math.round(hand.palmPosition[1]);
+						// 	var heightIn = Math.round(heightMm / 25.4);
+						// 	var heightFt = Math.round(heightMm / 304.8);
+
+						// 	var sphereCenter = hand.sphereCenter;
+						// 	//var center = ($(window).height() - $(this).outerHeight()) / 2) + $(window).scrollTop());
+						// 	if (i==0) {
+						// 		$('#top').css('top', 100+sphereCenter[2] + "px");
+						// 		$('#top').css('width', 50+sphereCenter[1] + "px");
+						// 		$('#top').css('height', 50+sphereCenter[1] + "px");
+						// 		$('#top').css('left', 100+sphereCenter[0] + "px");
+						// 		$('#top').css('zIndex', 50+sphereCenter[1] + "px");
+						// 	} else {
+						// 		$('#top2').css('top', 100+sphereCenter[2] + "px");
+						// 		$('#top2').css('width', 50+sphereCenter[1] + "px");
+						// 		$('#top2').css('height', 50+sphereCenter[1] + "px");
+						// 		$('#top2').css('left', 100+sphereCenter[0] + "px");
+						// 		$('#top2').css('zIndex', 50+sphereCenter[1] + "px");
+						// 	}
+
+						// 	displayMsg += '<br />Sphere: '+sphereCenter[0];
+						// 	displayMsg += '<br />Sphere: '+sphereCenter[1];
+						// 	displayMsg += '<br />Sphere: '+sphereCenter[2];
+						// 	displayMsg += '<br />';
+
+						// 	//displayMsg += '<br />Hand ' + i + '<br />';
+						// 	//displayMsg += 'Height: ' + heightMm + 'mm / ' 
+						// 	//	+ heightIn + 'in / ' 
+						// 	//	+ heightFt + 'ft';
+						// 	displayMsg += '<br />';
+						// }
+					} else {
+						wasSeen = false;
+					}
+					$('#display').html(displayMsg);
+				});
+			}
+		});
+	</script>
+</body>
+</html>

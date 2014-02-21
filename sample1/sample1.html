@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leap Sample 1</title>
+	<link rel='stylesheet' type='text/css' href='style.css' />
+</head>
+<body>
+	<h1>Leap Sample 1</h1>
+	<div id='display'>
+		Loading...
+	</div>
+
+	<div id="top" style="width:50px; height:50px; position: absolute; left:0px; top:0px; background-color: red;"></div>
+	<div id="top2" style="width:50px; height:50px; position: absolute; left:0px; top:0px; background-color: blue;"></div>
+
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script src='http://js.leapmotion.com/0.4.0/leap.js'></script>
+	<script type='text/javascript'>
+		$(document).ready(function() {
+			if (typeof(Leap) === 'undefined') {
+				$('#display').html('Leap JS client library, leap.js, not found');
+				alert('Leap JS client library, leap.js, not found.');
+			} else {
+				// Note: Leap produces frames faster than the browser can 
+				// utilize them, so while it is possible to get them all, 
+				// we will only receive frames on repaint here (Leap.loop 
+				// uses requestAnimationFrame).
+				var lmOptions = { enableGestures: true };
+				Leap.loop(lmOptions, function(frame) {
+					var displayMsg = 'No hands detected';
+					if (frame.hands.length > 0) {
+						displayMsg = 'Hand(s) detected<br />';
+						for (var i = 0; i < frame.hands.length; i++) {
+							var hand = frame.hands[i];
+							var heightMm = Math.round(hand.palmPosition[1]);
+							var heightIn = Math.round(heightMm / 25.4);
+							var heightFt = Math.round(heightMm / 304.8);
+
+							var sphereCenter = hand.sphereCenter;
+							//var center = ($(window).height() - $(this).outerHeight()) / 2) + $(window).scrollTop());
+							if (i==0) {
+								$('#top').css('top', 100+sphereCenter[2] + "px");
+								$('#top').css('width', 50+sphereCenter[1] + "px");
+								$('#top').css('height', 50+sphereCenter[1] + "px");
+								$('#top').css('left', 100+sphereCenter[0] + "px");
+								$('#top').css('zIndex', 50+sphereCenter[1] + "px");
+							} else {
+								$('#top2').css('top', 100+sphereCenter[2] + "px");
+								$('#top2').css('width', 50+sphereCenter[1] + "px");
+								$('#top2').css('height', 50+sphereCenter[1] + "px");
+								$('#top2').css('left', 100+sphereCenter[0] + "px");
+								$('#top2').css('zIndex', 50+sphereCenter[1] + "px");
+							}
+
+							displayMsg += '<br />Sphere: '+sphereCenter[0];
+							displayMsg += '<br />Sphere: '+sphereCenter[1];
+							displayMsg += '<br />Sphere: '+sphereCenter[2];
+							displayMsg += '<br />';
+
+							//displayMsg += '<br />Hand ' + i + '<br />';
+							//displayMsg += 'Height: ' + heightMm + 'mm / ' 
+							//	+ heightIn + 'in / ' 
+							//	+ heightFt + 'ft';
+							displayMsg += '<br />';
+						}
+					}
+					$('#display').html(displayMsg);
+				});
+			}
+		});
+	</script>
+</body>
+</html>
